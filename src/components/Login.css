@@ -1,0 +1,61 @@
+.dashboard-page {
+    display: flex;
+}
+
+.sidebar {
+    width: 250px;
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #343a40;
+    color: white;
+    padding: 15px;
+    transition: width 0.3s ease;
+}
+
+.sidebar.open {
+    width: 250px;
+}
+
+.sidebar .sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.sidebar .components {
+    margin-top: 20px;
+}
+
+.sidebar .components li {
+    padding: 10px 0;
+}
+
+.sidebar .components li a {
+    color: white;
+    text-decoration: none;
+}
+
+.sidebar .CTAs {
+    margin-top: 20px;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    width: 100%;
+    transition: margin-left 0.3s ease;
+}
+
+.sidebar-toggle {
+    border: none;
+    background: none;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.top-navbar {
+    padding-left: 250px;
+    transition: padding-left 0.
+}

@@ -1,0 +1,195 @@
+/* General styles */
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+}
+
+.dashboard-page {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.sidebar {
+    width: 250px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background: #343a40;
+    color: #fff;
+    transition: all 0.3s;
+    z-index: 1000;
+}
+
+.sidebar.open {
+    left: 0;
+}
+
+.sidebar-header {
+    padding: 20px;
+    background: #343a40;
+    text-align: center;
+}
+
+.sidebar .components {
+    padding: 20px;
+}
+
+.sidebar .components a {
+    color: #fff;
+    display: block;
+    padding: 10px;
+    text-decoration: none;
+}
+
+.sidebar .components a:hover {
+    background: #007bff;
+    color: #fff;
+    text-decoration: none;
+}
+
+.sidebar .CTAs {
+    position: absolute;
+    bottom: 20px;
+    width: 100%;
+    text-align: center;
+}
+
+.content {
+    margin-left: 250px;
+    padding: 20px;
+    width: calc(100% - 250px);
+    transition: all 0.3s;
+    align-items: center;
+    margin-top: 50px; /* Adjust to match the navbar height */
+}
+
+.top-navbar {
+    position: fixed;
+    width: calc(100% - 250px);
+    top: 0;
+    left: 250px;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 50px; /* Adjust the height as needed */
+    padding: 10px 20px; /* Adjust the padding as needed */
+    background-color: #343a40; /* Ensure it matches your design */
+    color: #fff;
+}
+
+.sidebar-toggle {
+    display: none;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.text-primary {
+    color: #007bff !important;
+}
+
+.navbar .ml-auto {
+    margin-left: auto !important;
+}
+
+.navbar .align-items-center {
+    display: flex;
+    align-items: center;
+    margin-left: auto;
+}
+
+.scrollable-div {
+    max-height: 300px; /* Set the maximum height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px; /* Optional: add padding */
+    border: 1px solid #ccc; /* Optional: add border */
+    margin: 10px 0; /* Optional: add margin */
+}
+
+.scrollable-div-referred {
+    max-height: 402px; /* Set the maximum height */
+    overflow-y: auto; /* Enable vertical scrolling */
+    padding: 10px; /* Optional: add padding */
+    border: 1px solid #ccc; /* Optional: add border */
+    margin: 10px 0; /* Optional: add margin */
+}
+
+/* Responsive styles */
+@media (max-width: 1024px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .content {
+        margin-left: 200px;
+        width: calc(100% - 200px);
+    }
+
+    .top-navbar {
+        width: calc(100% - 200px);
+        left: 200px;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        overflow-x: hidden;
+    }
+    .sidebar {
+        left: -250px;
+        width: 250px;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .top-navbar {
+        width: 100%;
+        left: 0;
+    }
+
+    .sidebar-toggle {
+        display: block;
+    }
+}
+
+@media (max-width: 576px) {
+    .sidebar {
+        left: -200px;
+        width: 200px;
+    }
+
+    .sidebar.open {
+        left: 0;
+    }
+
+    .content {
+        margin-left: 0;
+        width: 100%;
+    }
+
+    .top-navbar {
+        width: 100%;
+        left: 0;
+    }
+
+    .sidebar-toggle {
+        display: block;
+    }
+}
