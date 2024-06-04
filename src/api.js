@@ -1,63 +1,79 @@
 import axios from 'axios';
 
-const apiUrl = process.env.REACT_APP_API_URL;
+// Configure the base URL for axios
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 
-fetch(`${apiUrl}/some-endpoint`, {
-  method: 'GET',
-  // other fetch options
-})
-.then(response => response.json())
-.then(data => {
-  // handle the data
-});
+// Helper function to get the auth token
+const getAuthToken = () => localStorage.getItem('access_token');
 
+// Using axios for all API calls
+export const fetchUserData = async () => {
+    try {
+        const response = await axios.get('/api/user/', {
+            headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching user data:', error);
+        throw error;
+    }
+};
 
 export const registerUser = async (formData) => {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/register/`, formData, {
-        headers: {
-            'Content-Type': 'multipart/form-data',
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios.post('/register/', formData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error registering user:', error);
+        throw error;
+    }
 };
 
 export const loginUser = async (credentials) => {
-    const response = await axios.post(`${process.env.REACT_APP_API_URL}/login/`, credentials);
-    return response.data;
-};
-
-export const fetchUserData = async (token) => {
-    const response = await apiClient.get('/user/', {
-        headers: {
-            'Authorization': `Bearer ${token}`,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios.post('/login/', credentials);
+        return response.data;
+    } catch (error) {
+        console.error('Error logging in:', error);
+        throw error;
+    }
 };
 
 export const getUserDetail = async () => {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/user-detail/`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios.get('/user-detail/', {
+            headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error getting user details:', error);
+        throw error;
+    }
 };
 
 export const getEarnings = async () => {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/earnings/`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios.get('/earnings/', {
+            headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching earnings:', error);
+        throw error;
+    }
 };
 
 export const getCommissions = async () => {
-    const response = await axios.get(`${process.env.REACT_APP_API_URL}/commissions/`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem('access_token')}`,
-        },
-    });
-    return response.data;
+    try {
+        const response = await axios.get('/commissions/', {
+            headers: { 'Authorization': `Bearer ${getAuthToken()}` }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching commissions:', error);
+        throw error;
+    }
 };
