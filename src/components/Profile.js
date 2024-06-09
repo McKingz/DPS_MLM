@@ -3,9 +3,14 @@ import axios from 'axios';
 import { Container, Row, Col, Card, Form, Button, Image } from 'react-bootstrap';
 import './Profile.css';
 import { isTokenExpired, refreshToken, logout } from '../auth';
-import BackButton from './BackButton'
+import BackButton from './BackButton';
+
 const Profile = () => {
-    const [userData, setUserData] = useState({});
+    const [userData, setUserData] = useState({
+        email: '',
+        phone: '',
+        profile_picture: ''
+    });
     const [profilePicture, setProfilePicture] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -54,27 +59,27 @@ const Profile = () => {
         e.preventDefault();
         try {
             let token = localStorage.getItem('access_token');
-
+    
             if (isTokenExpired(token)) {
                 token = await refreshToken();
             }
-
+    
             const formData = new FormData();
             formData.append('username', userData.username);
             formData.append('email', userData.email);
             formData.append('phone', userData.phone);
-
+    
             if (profilePicture) {
                 formData.append('profile_picture', profilePicture);
             }
-
+    
             const response = await axios.put(`${process.env.REACT_APP_API_URL}/user/update`, formData, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data',
                 },
             });
-
+    
             setUserData(response.data);
             alert('Profile updated successfully');
         } catch (error) {
@@ -96,16 +101,6 @@ const Profile = () => {
                             <h2 className="text-center">Profile</h2>
                             <BackButton />
                             <Form onSubmit={handleSubmit}>
-                                <Form.Group controlId="formBasicUsername">
-                                    <Form.Label>Username</Form.Label>
-                                    <Form.Control
-                                        type="text"
-                                        name="username"
-                                        value={userData.username}
-                                        onChange={handleChange}
-                                        readOnly
-                                    />
-                                </Form.Group>
                                 <Form.Group controlId="formBasicEmail">
                                     <Form.Label>Email</Form.Label>
                                     <Form.Control
@@ -130,13 +125,13 @@ const Profile = () => {
                                         type="file"
                                         onChange={handleProfilePictureChange}
                                     />
-                                    {userData.profilePicture && (
+                                    {userData.profile_picture && (
                                         <div className="mt-3">
-                                            <Image src={userData.profilePicture} roundedCircle width="100" height="100" />
+                                            <Image src={userData.profile_picture} roundedCircle width="100" height="100" />
                                         </div>
                                     )}
                                 </Form.Group>
-                                <Button variant="primary" type="submit" block='true'>
+                                <Button variant="primary" type="submit" block={true}>
                                     Update Profile
                                 </Button>
                             </Form>

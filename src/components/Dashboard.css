@@ -7,6 +7,16 @@ body, html {
     overflow-x: hidden;
 }
 
+.profile-picture {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    border-radius: 50%;
+    display: block;
+    margin: 0 auto;
+    margin-left: 10px;
+}
+
 .dashboard-page {
     display: flex;
     flex-wrap: nowrap;

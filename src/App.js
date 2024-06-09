@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Login from './components/Login';
 import Register from './components/Register';
 import Dashboard from './components/Dashboard';
+import Refer from './components/Referrals';
 import { UserProvider } from './context/UserContext';
 import Profile from './components/Profile';
 import Logout from './components/Logout';
@@ -18,6 +19,7 @@ function App() {
                     <Route path="/" element={<Login />} />
                     <Route path="/register" element={<Register />} />
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/referrals" element={<Refer />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/commissions" element={<Commissions />} />
                     <Route path="/earnings" element={<Earnings />} />

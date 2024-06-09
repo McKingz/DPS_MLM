@@ -1,14 +1,15 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import { Container, Row, Col, Card, ListGroup, Button, Navbar, Nav, Image } from 'react-bootstrap';
 import { FaBell, FaBars } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { isTokenExpired, refreshToken, logout } from '../auth';
+import { UserContext } from '../context/UserContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './Dashboard.css';
 
 const Dashboard = () => {
-    const [userData, setUserData] = useState({});
+    const { user, setUser } = useContext(UserContext);
     const [referrals, setReferrals] = useState([]);
     const [loading, setLoading] = useState(true);
     const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -36,7 +37,7 @@ const Dashboard = () => {
 
                 const [userResponse, referralsResponse] = await Promise.all([userRequest, referralsRequest]);
 
-                setUserData(userResponse.data);
+                setUser(userResponse.data);
                 setReferrals(referralsResponse.data);
                 setLoading(false);
             } catch (error) {
@@ -49,22 +50,43 @@ const Dashboard = () => {
         };
 
         fetchData();
-    }, []);
+    }, [setUser]);
 
     if (loading) {
         return <div>Loading...</div>;
+    }
+
+    if (!user) {
+        return <div>Error: User data not available</div>;
     }
 
     const handleRefer = () => {
         navigate('/register');
     };
 
-    const referralUrl = `${window.location.origin}/register?referral_code=${userData.referral_code}`;
+    const referralUrl = `${window.location.origin}/register?referral_code=${user.referral_code}`;
 
     const handleShareReferralUrl = () => {
-        navigator.clipboard.writeText(referralUrl).then(() => {
-            alert('Referral URL copied to clipboard!');
-        });
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(referralUrl).then(() => {
+                alert('Referral URL copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+            });
+        } else {
+            // Fallback method for older browsers or non-HTTPS environments
+            const textArea = document.createElement("textarea");
+            textArea.value = referralUrl;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                alert('Referral URL copied to clipboard!');
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+            }
+            document.body.removeChild(textArea);
+        }
     };
 
     return (
@@ -88,7 +110,7 @@ const Dashboard = () => {
             <div className="content">
                 <Navbar bg="dark" variant="dark" className="top-navbar">
                     <Button variant="link" className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                        <FaBars className="text-white" />
+                    <FaBars className="text-white" />
                     </Button>
                     <Button variant='link' className='text-white'>
                         <a href='/'>Home</a>
@@ -98,9 +120,9 @@ const Dashboard = () => {
                             <FaBell className="text-white" />
                         </Nav.Link>
                         <Navbar.Text className="mr-3">
-                            Welcome: <a href="/profile">{userData.username ? userData.username : 'Guest'}</a>
+                            Welcome: <a href="/profile">{user.username ? user.username : 'Guest'}</a>
                         </Navbar.Text>
-                        <Image src={userData.profile_picture} roundedCircle className="mr-3" />
+                        <Image src={user.profile_picture} roundedCircle className="profile-picture" />
                     </Nav>
                 </Navbar>
                 <Container fluid>
@@ -109,10 +131,10 @@ const Dashboard = () => {
                         <Col lg={4} xs={12} className="mb-4">
                             <Card>
                                 <Card.Body>
-                                    <Card.Title>Welcome, {userData.username}!</Card.Title>
-                                    <Card.Text>Level: {userData.rank}</Card.Text>
-                                    <Card.Text>Total Referrals: {userData.total_referrals}</Card.Text>
-                                    <Card.Text>Earnings: R{userData.earnings}</Card.Text>
+                                    <Card.Title>Welcome: {user.username}</Card.Title>
+                                    <Card.Text>Level: {user.rank}</Card.Text>
+                                    <Card.Text>Total Referrals: {user.total_referrals}</Card.Text>
+                                    <Card.Text>Earnings: R{user.earnings}</Card.Text>
                                     <div className="scrollable-div">
                                         {referrals.length > 0 ? (
                                             referrals.map((referral, index) => (

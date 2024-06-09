@@ -1,17 +1,54 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { registerUser, getUserDetail } from '../api';  // Make sure this path is correct
+import { getUserDetail } from '../api';
 import { Form, Button, Container, Row, Col, Card, Navbar, Nav, Image } from 'react-bootstrap';
 import { FaBars, FaBell } from 'react-icons/fa';
 import './Register.css';
 import BackButton from './BackButton';
-import { logout } from '../auth';  // Make sure this path is correct
+
+function resizeImage(file, maxWidth, maxHeight, callback) {
+    const reader = new FileReader();
+    reader.onload = (event) => {
+        const img = new Image();
+        img.onload = () => {
+            const canvas = document.createElement('canvas');
+            let width = img.width;
+            let height = img.height;
+
+            if (width > height) {
+                if (width > maxWidth) {
+                    height *= maxWidth / width;
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxHeight) {
+                    width *= maxHeight / height;
+                    height = maxHeight;
+                }
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob((blob) => {
+                callback(blob);
+            }, 'image/jpeg', 0.9);
+        };
+        img.src = event.target.result;
+    };
+    reader.readAsDataURL(file);
+}
 
 const Register = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [password2, setPassword2] = useState('');
     const [email, setEmail] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
     const [profilePic, setProfilePic] = useState(null);
     const [profilePicUrl, setProfilePicUrl] = useState(null);
     const [referralCode, setReferralCode] = useState('');
@@ -21,7 +58,6 @@ const Register = () => {
     const location = useLocation();
 
     useEffect(() => {
-        // Fetch logged-in user details
         const fetchUserDetail = async () => {
             try {
                 const userDetail = await getUserDetail();
@@ -47,38 +83,48 @@ const Register = () => {
 
     const handleFileChange = (event) => {
         const file = event.target.files[0];
-        setProfilePic(file);
-        setProfilePicUrl(URL.createObjectURL(file));
-    };
-
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        const formData = new FormData();
-        formData.append('username', username);
-        formData.append('password', password);
-        formData.append('email', email);
-        formData.append('phone_number', phoneNumber);
-        formData.append('referral_code', referralCode);
-        formData.append('profile_picture', profilePic);
-
-        try {
-            await registerUser(formData);
-            alert('Registration successful!');
-            navigate('/dashboard');
-        } catch (error) {
-            console.error('Registration failed', error);
-            if (error.response && error.response.data) {
-                console.error('Server response:', error.response.data);
-                alert(`Registration failed: ${error.response.data.error || 'Unknown error'}`);
-            } else {
-                alert('Registration failed');
-            }
+        if (file) {
+            resizeImage(file, 800, 800, (resizedBlob) => {
+                const resizedFile = new File([resizedBlob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+                setProfilePic(resizedFile);
+                setProfilePicUrl(URL.createObjectURL(resizedFile));
+            });
         }
     };
 
-    const handleLogout = () => {
-        logout();
-        navigate('/login');
+    const handleSubmit = async (event) => {
+        event.preventDefault();
+        const formData = new FormData();
+        formData.append('username', username);
+        formData.append('email', email);
+        formData.append('password', password);
+        formData.append('password2', password2);
+        formData.append('phone_number', phoneNumber);
+        formData.append('first_name', firstName);
+        formData.append('last_name', lastName);
+        formData.append('referral_code', referralCode);
+        if (profilePic) {
+            formData.append('profile_picture', profilePic);
+        }
+
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/api/register/', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            console.log('Registration successful', response.data);
+            navigate('/dashboard');
+        } catch (error) {
+            if (error.response) {
+                console.error('Server response:', error.response.data);
+            } else {
+                console.error('Error:', error.message);
+            }
+        }
     };
 
     return (
@@ -87,23 +133,18 @@ const Register = () => {
                 <div className="sidebar-header">
                     <h3>DPS MLM</h3>
                 </div>
-                <div>
-                    <Button variant='link' onClick={handleLogout}>Logout</Button>
-                </div>
-                <div className="content">
-                    <Navbar bg="dark" variant="dark" className="top-navbar">
-                        <Button variant="link" className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
-                            <FaBars className="text-white" />
-                        </Button>
-                        <Nav className="ml-auto align-items-center">
-                            <Navbar.Text className="mr-3">
-                                Signed in as: <a href="/profile">{username}</a>
-                            </Navbar.Text>
-                            <Image src={profilePicUrl || "https://via.placeholder.com/30"} roundedCircle className="mr-3" />
-                            <FaBell className="text-white" />
-                        </Nav>
-                    </Navbar>
-                </div>
+                <Navbar bg="dark" variant="dark" className="top-navbar">
+                    <Button variant="link" className="sidebar-toggle" onClick={() => setSidebarOpen(!sidebarOpen)}>
+                        <FaBars className="text-white" />
+                    </Button>
+                    <Nav className="ml-auto align-items-center">
+                        <Navbar.Text className="mr-3">
+                            Signed in as: <a href="/profile">{username}</a>
+                        </Navbar.Text>
+                        <Image src={profilePicUrl || "https://via.placeholder.com/30"} roundedCircle className="mr-3" />
+                        <FaBell className="text-white" />
+                    </Nav>
+                </Navbar>
             </nav>
             <Container className="register-container">
                 <Row className="justify-content-md-center">
@@ -120,6 +161,26 @@ const Register = () => {
                                             placeholder="Enter username"
                                             value={username}
                                             onChange={(e) => setUsername(e.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formBasicFirstName">
+                                        <Form.Label>First Name</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Enter first name"
+                                            value={firstName}
+                                            onChange={(e) => setFirstName(e.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formBasicLastName">
+                                        <Form.Label>Last Name</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Enter last name"
+                                            value={lastName}
+                                            onChange={(e) => setLastName(e.target.value)}
                                             required
                                         />
                                     </Form.Group>
@@ -150,6 +211,16 @@ const Register = () => {
                                             placeholder="Enter password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
+                                            required
+                                        />
+                                    </Form.Group>
+                                    <Form.Group controlId="formBasicConfirmPassword">
+                                        <Form.Label>Confirm Password</Form.Label>
+                                        <Form.Control
+                                            type="password"
+                                            placeholder="Confirm password"
+                                            value={password2}
+                                            onChange={(e) => setPassword2(e.target.value)}
                                             required
                                         />
                                     </Form.Group>

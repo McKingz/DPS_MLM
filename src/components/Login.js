@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { loginUser } from '../api';
+import { loginUser } from '../auth';
 import { UserContext } from '../context/UserContext';
 import { Form, Button, Container, Row, Col, Card } from 'react-bootstrap';
 import './Login.css'; 
@@ -14,11 +14,8 @@ const Login = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const data = await loginUser({ username, password });
-            localStorage.setItem('access_token', data.access);
-            localStorage.setItem('refresh_token', data.refresh);
-            localStorage.setItem('token_expiry', new Date().getTime() + 5 * 60 * 1000); // Adjust based on your expiry
-            setUser(data.user);
+            const user = await loginUser({ username, password });
+            setUser(user);
             navigate('/dashboard');
         } catch (error) {
             console.error('Login failed', error);
